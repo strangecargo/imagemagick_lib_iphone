@@ -47,8 +47,9 @@ PNG_DIR="$IM_DIR/IMDelegates/libpng-1.4.3"
 TIFF_DIR="$IM_DIR/IMDelegates/tiff-3.8.2"
 
 # Architectures and versions
-ARCH_SIM="i386"
-ARCH_IPHONE="armv6"
+ARCH_x86="i386"
+ARCH_ARMV6="armv6"
+ARCH_ARMV7="armv7"
 GCC_VERSION="4.0.1"
 CLANG_VERSION="1.5"
 MIN_IPHONE_VERSION="4.1"
@@ -87,7 +88,7 @@ export MACOSXROOT=/Developer/SDKs/MacOSX10.6.sdk
 
 # Compiler flags and config arguments - IPHONE
 COMMON_IPHONE_LDFLAGS="-L$SDKROOT/usr/lib/"
-COMMON_IPHONE_CFLAGS="-arch $ARCH_IPHONE -miphoneos-version-min=$MIN_IPHONE_VERSION -pipe -no-cpp-precomp -isysroot $SDKROOT \
+COMMON_IPHONE_CFLAGS="-miphoneos-version-min=$MIN_IPHONE_VERSION -pipe -no-cpp-precomp -Os -isysroot $SDKROOT \
 -I$SDKROOT/usr/include -I$SDKROOT/usr/lib/clang/$CLANG_VERSION/include/ -L$SDKROOT/usr/lib/"
 
 IM_LDFLAGS="-L$LIB_DIR/jpeg_arm_dylib/ -L$LIB_DIR/png_arm_dylib/ -L$LIB_DIR/tiff_arm_dylib/ -L$LIB_DIR"
@@ -132,11 +133,11 @@ cp $PNG_LIB_DIR/lib/$LIBPATH_png_dylib $LIB_DIR/png_arm_dylib/libpng.dylib
 
 make distclean
 
-elif [ "$1" == "$ARCH_SIM" ]; then ##  INTEL  ##
+elif [ "$1" == "$ARCH_x86" ]; then ##  INTEL  ##
 
 # Use default environment
 export CC=$U_CC
-export CFLAGS="-arch $ARCH_SIM"
+export CFLAGS="-arch $ARCH_x86"
 export LD=$U_LD
 export LDFLAGS="-L/usr/lib/ $U_LDFLAGS"
 export CPP=$U_CPP
@@ -156,7 +157,7 @@ cp $PNG_LIB_DIR/include/libpng14/* $LIB_DIR/include/png/
 make distclean
 
 # combine the static libraries for i386 and arm
-$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/libpng.a.arm -arch $ARCH_SIM $LIB_DIR/libpng.a.i386 -create -output $LIB_DIR/libpng.a
+$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/libpng.a.arm -arch $ARCH_x86 $LIB_DIR/libpng.a.i386 -create -output $LIB_DIR/libpng.a
 
 fi
 
@@ -197,13 +198,13 @@ cp $JPEG_LIB_DIR/lib/libjpeg.62.0.0.dylib $LIB_DIR/jpeg_arm_dylib/libjpeg.dylib
 
 make distclean
 
-elif [ "$1" == "$ARCH_SIM" ]; then ##  INTEL  ##
+elif [ "$1" == "$ARCH_x86" ]; then ##  INTEL  ##
 
 # Use default environment
 export CC=$U_CC
-export CFLAGS="-arch $ARCH_SIM"
+export CFLAGS="-arch $ARCH_x86"
 export LD=$U_LD
-export LDFLAGS="-L/usr/lib/ -arch $ARCH_SIM"
+export LDFLAGS="-L/usr/lib/ -arch $ARCH_x86"
 export CPP=$U_CPP
 export CPPFLAGS=$U_CPPFLAGS
 
@@ -220,7 +221,7 @@ cp $JPEG_LIB_DIR/include/*.h $LIB_DIR/include/jpeg/
 make distclean
 
 # combine the static libraries for i386 and arm
-$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_jpeg.arm -arch $ARCH_SIM $LIB_DIR/$LIBNAME_jpeg.i386 -create -output $LIB_DIR/$LIBNAME_jpeg
+$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_jpeg.arm -arch $ARCH_x86 $LIB_DIR/$LIBNAME_jpeg.i386 -create -output $LIB_DIR/$LIBNAME_jpeg
 
 fi
 
@@ -260,11 +261,11 @@ cp $TIFF_LIB_DIR/lib/libtiff.3.dylib $LIB_DIR/tiff_arm_dylib/libtiff.dylib
 
 make distclean
 
-elif [ "$1" == "$ARCH_SIM" ]; then ##  INTEL  ##
+elif [ "$1" == "$ARCH_x86" ]; then ##  INTEL  ##
 
 # Use default environment
 export CC=$U_CC
-export CFLAGS="-arch $ARCH_SIM"
+export CFLAGS="-arch $ARCH_x86"
 export LD=$U_LD
 export LDFLAGS="-L/usr/lib/ $U_LDFLAGS"
 export CPP=$U_CPP
@@ -282,7 +283,7 @@ cp $TIFF_LIB_DIR/include/*.h $LIB_DIR/include/tiff/
 make distclean
 
 # combine the static libraries for i386 and arm
-$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_tiff.arm -arch $ARCH_SIM $LIB_DIR/$LIBNAME_tiff.i386 -create -output $LIB_DIR/$LIBNAME_tiff
+$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_tiff.arm -arch $ARCH_x86 $LIB_DIR/$LIBNAME_tiff.i386 -create -output $LIB_DIR/$LIBNAME_tiff
 
 fi
 
@@ -302,7 +303,7 @@ LIBNAME_static=`basename $LIBPATH_static`
 LIBPATH_static2=$IM_LIB_DIR/lib/libMagickWand.a
 LIBNAME_static2=`basename $LIBPATH_static2`
 
-if [ "$1" == "$ARCH_IPHONE" ]; then ##  ARM	 ##
+if [ "$1" == "$ARCH_ARMV6" ]; then ##  ARMV6	 ##
 
 # Save relevant environment
 U_CC=$CC
@@ -313,7 +314,7 @@ U_CPP=$CPP
 U_CPPFLAGS=$CPPFLAGS
 
 export LDFLAGS="$IM_LDFLAGS $COMMON_IPHONE_LDFLAGS"
-export CFLAGS="$COMMON_IPHONE_CFLAGS $IM_IFLAGS -DHAVE_J1=0 -DTARGET_OS_IPHONE"
+export CFLAGS="-arch armv6 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 
 # configure to have the static libraries and make
@@ -326,18 +327,40 @@ make -j2
 make install
 
 # copy the CORE + WAND libraries -- ARM version
-cp $LIBPATH_static $LIB_DIR/$LIBNAME_static.arm
-cp $LIBPATH_static2 $LIB_DIR/$LIBNAME_static2.arm
+cp $LIBPATH_static $LIB_DIR/$LIBNAME_static.armv6
+cp $LIBPATH_static2 $LIB_DIR/$LIBNAME_static2.armv6
 
 # clean the ImageMagick build
 make distclean
 
-elif [ "$1" == "$ARCH_SIM" ]; then ##  INTEL  ##
+elif [ "$1" == "$ARCH_ARMV7" ]; then ##  ARMV7	 ##
+
+export LDFLAGS="$IM_LDFLAGS $COMMON_IPHONE_LDFLAGS"
+export CFLAGS="-arch armv7 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DHAVE_J1=0 -DTARGET_OS_IPHONE"
+export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DHAVE_J1=0 -DTARGET_OS_IPHONE"
+
+# configure to have the static libraries and make
+./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
+--disable-largefile --without-magick-plus-plus --without-perl --without-x \
+--disable-shared --without-bzlib --without-freetype
+
+# compile ImageMagick
+make -j2
+make install
+
+# copy the CORE + WAND libraries -- ARM version
+cp $LIBPATH_static $LIB_DIR/$LIBNAME_static.armv7
+cp $LIBPATH_static2 $LIB_DIR/$LIBNAME_static2.armv7
+
+# clean the ImageMagick build
+make distclean
+
+elif [ "$1" == "$ARCH_x86" ]; then ##  INTEL  ##
 
 # Use default environment
 export CC=$U_CC
 export LDFLAGS="-isysroot $MACOSXROOT -mmacosx-version-min=10.6"
-export CFLAGS="-arch $ARCH_SIM -isysroot $MACOSXROOT -mmacosx-version-min=10.6 -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
+export CFLAGS="-arch $ARCH_x86 -isysroot $MACOSXROOT -mmacosx-version-min=10.6 -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 export LD=$U_LD
 export CPP=$U_CPP
 export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
@@ -368,8 +391,8 @@ cp $IM_LIB_DIR/share/ImageMagick-*/config/*.icm $LIB_DIR/include/im_config/
 make distclean
 
 # combine the two generated libraries to be used both in the simulator and in the device
-$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static.arm $LIB_DIR/$LIBNAME_static.i386 -create -output $LIB_DIR/$LIBNAME_static
-$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static2.arm $LIB_DIR/$LIBNAME_static2.i386 -create -output $LIB_DIR/$LIBNAME_static2
+$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static.armv6 $LIB_DIR/$LIBNAME_static.armv7 $LIB_DIR/$LIBNAME_static.i386 -create -output $LIB_DIR/$LIBNAME_static
+$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static2.armv6 $LIB_DIR/$LIBNAME_static2.armv7 $LIB_DIR/$LIBNAME_static2.i386 -create -output $LIB_DIR/$LIBNAME_static2
 
 fi
 
@@ -409,12 +432,13 @@ function zip_for_ftp() {
 }
 
 #png "$ARCH_IPHONE"
-#png "$ARCH_SIM"
+#png "$ARCH_x86"
 #jpeg "$ARCH_IPHONE"
-#jpeg "$ARCH_SIM"
+#jpeg "$ARCH_x86"
 #tiff "$ARCH_IPHONE"
-#tiff "$ARCH_SIM"
-im "$ARCH_IPHONE"
-im "$ARCH_SIM"
+#tiff "$ARCH_x86"
+im "$ARCH_ARMV6"
+im "$ARCH_ARMV7"
+im "$ARCH_x86"
 structure_for_xcode
 # zip_for_ftp
