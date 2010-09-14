@@ -50,8 +50,9 @@ TIFF_DIR="$IM_DIR/IMDelegates/tiff-3.8.2"
 ARCH_SIM="i386"
 ARCH_IPHONE="armv6"
 GCC_VERSION="4.0.1"
-MIN_IPHONE_VERSION="3.1"
-IPHONE_SDK_VERSION="4.0"
+CLANG_VERSION="1.5"
+MIN_IPHONE_VERSION="4.1"
+IPHONE_SDK_VERSION="4.1"
 
 # Set this to where you want the libraries to be placed (if dir is not present it will be created):
 TARGET_LIB_DIR=$(pwd)/tmp_target
@@ -81,28 +82,16 @@ mkdir -p $TIFF_LIB_DIR # libtiff manages to create subdirectories by itself with
 # General folders where you have the iPhone compiler + tools
 export DEVROOT=/Developer/Platforms/iPhoneOS.platform/Developer
 # Change this to match for which version of the SDK you want to compile -- you can change the number for the version
-export SDKROOT=$DEVROOT/SDKs/iPhoneOS4.0.sdk
-export MACOSXROOT=/Developer/SDKs/MacOSX10.5.sdk
+export SDKROOT=$DEVROOT/SDKs/iPhoneOS4.1.sdk
+export MACOSXROOT=/Developer/SDKs/MacOSX10.6.sdk
 
 # Compiler flags and config arguments - IPHONE
 COMMON_IPHONE_LDFLAGS="-L$SDKROOT/usr/lib/"
 COMMON_IPHONE_CFLAGS="-arch $ARCH_IPHONE -miphoneos-version-min=$MIN_IPHONE_VERSION -pipe -no-cpp-precomp -isysroot $SDKROOT \
--I$SDKROOT/usr/include -I$SDKROOT/usr/lib/gcc/arm-apple-darwin10/$GCC_VERSION/include/ -L$SDKROOT/usr/lib/"
+-I$SDKROOT/usr/include -I$SDKROOT/usr/lib/clang/$CLANG_VERSION/include/ -L$SDKROOT/usr/lib/"
 
 IM_LDFLAGS="-L$LIB_DIR/jpeg_arm_dylib/ -L$LIB_DIR/png_arm_dylib/ -L$LIB_DIR/tiff_arm_dylib/ -L$LIB_DIR"
 IM_IFLAGS="-I$LIB_DIR/include/jpeg -I$LIB_DIR/include/png -I$LIB_DIR/include/tiff"
-
-############    HACK    ############
-# ImageMagick requires this header, that doesn't exist for the iPhone
-# Just copying it make things compile/work
-if [ -e $SDKROOT/usr/include/crt_externs.h ]; then
-	echo "crt_externals.h already copied! Good to go!";
-else
-	echo "need to copy crt_externals.h for compilation, please enter sudo password"
-	sudo cp "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator$IPHONE_SDK_VERSION.sdk/usr/include/crt_externs.h" \
-		"$SDKROOT/usr/include/crt_externs.h"
-fi
-############    END     ############
 
 #freetype config
 #./configure --prefix=/Users/cloud/Desktop/freetype_compiled --host=arm-apple-darwin --enable-static=yes --enable-shared=yes CC=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-gcc-4.0.1 CFLAGS="-arch armv6 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -fmessage-length=0 -fvisibility=hidden -gdwarf-2 -mthumb -I/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS2.0.sdk/usr/include/libxml2 -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.1.3.sdk" CPP=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/cpp AR=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ar LDFLAGS="-arch armv6 -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.1.3.sdk -Wl,-dead_strip"
@@ -328,12 +317,12 @@ export CFLAGS="$COMMON_IPHONE_CFLAGS $IM_IFLAGS -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 
 # configure to have the static libraries and make
-./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/arm-apple-darwin10-gcc-$GCC_VERSION LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
---disable-largefile --with-quantum-depth=8 --without-magick-plus-plus --without-perl --without-x \
---disable-shared --disable-openmp --without-bzlib --without-freetype
+./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
+--disable-largefile --without-magick-plus-plus --without-perl --without-x \
+--disable-shared --without-bzlib --without-freetype
 
 # compile ImageMagick
-make
+make -j2
 make install
 
 # copy the CORE + WAND libraries -- ARM version
@@ -347,19 +336,19 @@ elif [ "$1" == "$ARCH_SIM" ]; then ##  INTEL  ##
 
 # Use default environment
 export CC=$U_CC
-export LDFLAGS="-isysroot $MACOSXROOT -mmacosx-version-min=10.5"
-export CFLAGS="-arch $ARCH_SIM -isysroot $MACOSXROOT -mmacosx-version-min=10.5 -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
+export LDFLAGS="-isysroot $MACOSXROOT -mmacosx-version-min=10.6"
+export CFLAGS="-arch $ARCH_SIM -isysroot $MACOSXROOT -mmacosx-version-min=10.6 -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 export LD=$U_LD
 export CPP=$U_CPP
 export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -L$LIB_DIR -DHAVE_J1=0 -DTARGET_OS_IPHONE"
 
 # configure with standard parameters
-./configure prefix=$IM_LIB_DIR --host=i686-apple-darwin10 \
---disable-largefile --with-quantum-depth=8 --without-magick-plus-plus --without-perl --without-x \
---disable-shared --disable-openmp --without-bzlib --without-freetype
+./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang --host=i686-apple-darwin10 \
+--disable-largefile --without-magick-plus-plus --without-perl --without-x \
+--disable-shared --without-bzlib --without-freetype
 
 # compile ImageMagick
-make
+make -j2
 make install
 
 # copy the CORE + WAND libraries -- INTEL version
@@ -379,8 +368,8 @@ cp $IM_LIB_DIR/share/ImageMagick-*/config/*.icm $LIB_DIR/include/im_config/
 make distclean
 
 # combine the two generated libraries to be used both in the simulator and in the device
-$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_static.arm -arch $ARCH_SIM $LIB_DIR/$LIBNAME_static.i386 -create -output $LIB_DIR/$LIBNAME_static
-$DEVROOT/usr/bin/lipo -arch arm $LIB_DIR/$LIBNAME_static2.arm -arch $ARCH_SIM $LIB_DIR/$LIBNAME_static2.i386 -create -output $LIB_DIR/$LIBNAME_static2
+$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static.arm $LIB_DIR/$LIBNAME_static.i386 -create -output $LIB_DIR/$LIBNAME_static
+$DEVROOT/usr/bin/lipo $LIB_DIR/$LIBNAME_static2.arm $LIB_DIR/$LIBNAME_static2.i386 -create -output $LIB_DIR/$LIBNAME_static2
 
 fi
 
@@ -419,12 +408,12 @@ function zip_for_ftp() {
 	echo "-------------- All Done! --------------"
 }
 
-png "$ARCH_IPHONE"
-png "$ARCH_SIM"
-jpeg "$ARCH_IPHONE"
-jpeg "$ARCH_SIM"
-tiff "$ARCH_IPHONE"
-tiff "$ARCH_SIM"
+#png "$ARCH_IPHONE"
+#png "$ARCH_SIM"
+#jpeg "$ARCH_IPHONE"
+#jpeg "$ARCH_SIM"
+#tiff "$ARCH_IPHONE"
+#tiff "$ARCH_SIM"
 im "$ARCH_IPHONE"
 im "$ARCH_SIM"
 structure_for_xcode
