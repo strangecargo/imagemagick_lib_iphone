@@ -106,7 +106,7 @@ export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE"
 # configure to have the static libraries and make
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
 --disable-largefile --without-magick-plus-plus --without-perl --without-x \
---disable-shared --without-bzlib --without-zlib --without-freetype
+--disable-shared --without-bzlib --without-zlib --without-png --without-freetype
 
 # compile ImageMagick
 make -j2
@@ -128,7 +128,7 @@ export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE"
 # configure to have the static libraries and make
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
 --disable-largefile --without-magick-plus-plus --without-perl --without-x \
---disable-shared --without-bzlib --without-zlib --without-freetype
+--disable-shared --without-bzlib --without-zlib --without-png --without-freetype
 
 # compile ImageMagick
 make -j2
@@ -154,7 +154,7 @@ export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE"
 # configure with standard parameters
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang --host=i686-apple-darwin10 \
 --disable-largefile --without-magick-plus-plus --without-perl --without-x \
---disable-shared --without-bzlib --without-zlib --without-freetype
+--disable-shared --without-bzlib --without-zlib --without-png --without-freetype
 
 # compile ImageMagick
 make -j2
