@@ -69,7 +69,7 @@ export MACOSXROOT=/Developer/SDKs/MacOSX10.6.sdk
 
 # Compiler flags and config arguments - IPHONE
 COMMON_IPHONE_LDFLAGS="-L$SDKROOT/usr/lib/"
-COMMON_IPHONE_CFLAGS="-mthumb -miphoneos-version-min=$MIN_IPHONE_VERSION -pipe -Os -isysroot $SDKROOT \
+COMMON_IPHONE_CFLAGS="-miphoneos-version-min=$MIN_IPHONE_VERSION -pipe -Os -isysroot $SDKROOT \
 -I$SDKROOT/usr/include -I$SDKROOT/usr/lib/clang/$CLANG_VERSION/include/"
 
 IM_LDFLAGS="-L$LIB_DIR"
@@ -100,8 +100,8 @@ U_CPP=$CPP
 U_CPPFLAGS=$CPPFLAGS
 
 export LDFLAGS="$IM_LDFLAGS $COMMON_IPHONE_LDFLAGS"
-export CFLAGS="-arch armv6 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE"
-export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE"
+export CFLAGS="-arch armv6 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
+export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
 
 # configure to have the static libraries and make
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
@@ -122,8 +122,8 @@ make distclean
 elif [ "$1" == "$ARCH_ARMV7" ]; then ##  ARMV7	 ##
 
 export LDFLAGS="$IM_LDFLAGS $COMMON_IPHONE_LDFLAGS"
-export CFLAGS="-arch armv7 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE"
-export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE"
+export CFLAGS="-arch armv7 $COMMON_IPHONE_CFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
+export CXXFLAGS="-Wall -W -D_THREAD_SAFE -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
 
 # configure to have the static libraries and make
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang LD=$DEVROOT/usr/bin/ld --host=arm-apple-darwin \
@@ -146,10 +146,10 @@ elif [ "$1" == "$ARCH_x86" ]; then ##  INTEL  ##
 # Use default environment
 export CC=$U_CC
 export LDFLAGS="-isysroot $MACOSXROOT -mmacosx-version-min=10.6"
-export CFLAGS="-arch $ARCH_x86 -isysroot $MACOSXROOT -mmacosx-version-min=10.6 -DTARGET_OS_IPHONE"
+export CFLAGS="-arch $ARCH_x86 -isysroot $MACOSXROOT -mmacosx-version-min=10.6 -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
 export LD=$U_LD
 export CPP=$U_CPP
-export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE"
+export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE -DMAGICKCORE_WORDS_BIGENDIAN"
 
 # configure with standard parameters
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang --host=i686-apple-darwin10 \
