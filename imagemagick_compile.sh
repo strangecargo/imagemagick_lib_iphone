@@ -154,7 +154,7 @@ export CPPFLAGS="$U_CPPFLAGS $U_LDFLAGS $IM_IFLAGS -DTARGET_OS_IPHONE -DMAGICKCO
 # configure with standard parameters
 ./configure prefix=$IM_LIB_DIR CC=$DEVROOT/usr/bin/clang --host=i686-apple-darwin10 \
 --disable-largefile --without-magick-plus-plus --without-perl --without-x \
---disable-shared --without-bzlib --without-zlib --without-png --without-freetype
+--disable-shared --disable-opencl --without-bzlib --without-zlib --without-png --without-freetype
 
 # compile ImageMagick
 make -j2
